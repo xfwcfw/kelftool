@@ -86,11 +86,17 @@ void xor_bit(const void* a, const void* b, void* Result, size_t Length)
 int Kelf::LoadKelf(std::string filename)
 {
 	FILE* f = fopen(filename.c_str(), "rb");
-	
-	// TODO: in some cases the header is bigger. Add support for that.
 
 	KELFHeader header;
 	fread(&header, sizeof(header), 1, f);
+
+	if (header.Flags & 1 || header.Flags & 0xf0000 || header.BitCount != 0)
+	{
+		printf("This file is not supported yet and looked after.");
+		printf("Please upload it and post it under that issue:");
+		printf("https://github.com/xfwcfw/kelftool/issues/1");
+		return KELF_ERROR_UNSUPPORTED_FILE;
+	}
 
 	std::string HeaderSignature;
 	HeaderSignature.resize(8);
