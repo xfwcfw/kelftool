@@ -21,14 +21,18 @@
 
 std::string getKeyStorePath()
 {
+#ifdef __linux__
+	return std::string(getenv("HOME")) + "/PS2KEYS.dat";
+#else
 	return std::string(getenv("USERPROFILE")) + "\\PS2KEYS.dat";
+#endif
 }
 
 int decrypt(int argc, char** argv)
 {
 	if (argc < 2)
 	{
-		printf("%s decrypt <input> <output>", argv[0]);
+		printf("%s decrypt <input> <output>\n", argv[0]);
 		return -1;
 	}
 
@@ -36,7 +40,7 @@ int decrypt(int argc, char** argv)
 	int ret = ks.Load(getKeyStorePath());
 	if (ret != 0)
 	{
-		printf("Failed to load keystore: %d - %s", ret, KeyStore::getErrorString(ret).c_str());
+		printf("Failed to load keystore: %d - %s\n", ret, KeyStore::getErrorString(ret).c_str());
 		return ret;
 	}
 
@@ -61,7 +65,7 @@ int encrypt(int argc, char** argv)
 {
 	if (argc < 2)
 	{
-		printf("%s decrypt <input> <output>", argv[0]);
+		printf("%s decrypt <input> <output>\n", argv[0]);
 		return -1;
 	}
 
@@ -69,7 +73,7 @@ int encrypt(int argc, char** argv)
 	int ret = ks.Load(getKeyStorePath());
 	if (ret != 0)
 	{
-		printf("Failed to load keystore: %d - %s", ret, KeyStore::getErrorString(ret).c_str());
+		printf("Failed to load keystore: %d - %s\n", ret, KeyStore::getErrorString(ret).c_str());
 		return ret;
 	}
 
