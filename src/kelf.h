@@ -27,13 +27,17 @@
 #define KELF_ERROR_INVALID_CONTENT_SIGNATURE -6
 #define KELF_ERROR_UNSUPPORTED_FILE -6
 
+#define SYSTEM_TYPE_PS2 0 // same for COH (arcade)
+#define SYSTEM_TYPE_PSX 1
+
 #pragma pack(push, 1)
 struct KELFHeader
 {
 	uint8_t UserDefined[16];
 	uint32_t ContentSize; // Sometimes not...
 	uint16_t HeaderSize;
-	uint16_t unk;
+	uint8_t SystemType;
+	uint8_t ApplicationType;
 	uint16_t Flags;
 	uint16_t BitCount;
 	uint32_t MGZones;

@@ -164,8 +164,9 @@ int Kelf::SaveKelf(std::string filename)
 	memcpy(header.UserDefined, PSX_USER, 16);
 	header.ContentSize = Content.size();
 	header.HeaderSize = sizeof(KELFHeader) + 8 + 16 + 16 + 8 + 16 + 16 + 8 + 8; // header + header signature + kbit + kc + bittable + bittable signature + root signature
-	header.unk = 0x0101; // PSX
-	header.Flags = 0x22C; // PSX
+	header.SystemType = SYSTEM_TYPE_PSX;
+	header.ApplicationType = 1; // 1 = xosdmain, 5 = dvdplayer kirx 7 = dvdplayer kelf
+	header.Flags = 0x22C;
 	header.BitCount = 0;
 	header.MGZones = 1; // Japan
 
