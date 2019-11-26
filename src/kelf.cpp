@@ -348,14 +348,26 @@ int Kelf::VerifyContentSignature()
 			uint8_t signature[8];
 			memset(signature, 0, 8);
 
-			for (int j = 0; j < bitTable.Blocks[i].Size; j += 8)
-				xor_bit(&Content.data()[offset + j], signature, signature, 8);
+			if (bitTable.Blocks[i].Flags & BIT_BLOCK_ENCRYPTED)
+			{
+				for (int j = 0; j < bitTable.Blocks[i].Size; j += 8)
+					xor_bit(&Content.data()[offset + j], signature, signature, 8);
 
-			uint8_t MG_SIG_MASTER_AND_HASH_KEY[16];
-			memcpy(MG_SIG_MASTER_AND_HASH_KEY, ks.GetSignatureMasterKey().data(), 8);
-			memcpy(MG_SIG_MASTER_AND_HASH_KEY + 8, ks.GetSignatureHashKey().data(), 8);
+				uint8_t MG_SIG_MASTER_AND_HASH_KEY[16];
+				memcpy(MG_SIG_MASTER_AND_HASH_KEY, ks.GetSignatureMasterKey().data(), 8);
+				memcpy(MG_SIG_MASTER_AND_HASH_KEY + 8, ks.GetSignatureHashKey().data(), 8);
 
-			TdesCbcCfb64Encrypt(signature, signature, 8, MG_SIG_MASTER_AND_HASH_KEY, 2, MG_IV_NULL);
+				TdesCbcCfb64Encrypt(signature, signature, 8, MG_SIG_MASTER_AND_HASH_KEY, 2, MG_IV_NULL);
+			}
+			else
+			{
+				std::string SigMasterEnc;
+				SigMasterEnc.resize(bitTable.Blocks[i].Size);
+				TdesCbcCfb64Encrypt(SigMasterEnc.data(), &Content.data()[offset], bitTable.Blocks[i].Size, ks.GetSignatureMasterKey().data(), 1, MG_IV_NULL);
+				memcpy(signature, &SigMasterEnc.data()[bitTable.Blocks[i].Size - 8], 8);
+				TdesCbcCfb64Decrypt(signature, signature, 8, ks.GetSignatureHashKey().data(), 1, MG_IV_NULL);
+				TdesCbcCfb64Encrypt(signature, signature, 8, ks.GetSignatureMasterKey().data(), 1, MG_IV_NULL);
+			}
 
 			if (memcmp(bitTable.Blocks[i].Signature, signature, 8) != 0)
 				return KELF_ERROR_INVALID_CONTENT_SIGNATURE;
