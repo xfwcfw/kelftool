@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <openssl/des.h>
+#include <string.h>
 
 #include "kelf.h"
 
