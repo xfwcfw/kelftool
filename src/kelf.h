@@ -77,7 +77,7 @@ public:
 	void EncryptKeys(std::string KEK);
 	std::string GetBitTableSignature();
 	std::string GetRootSignature(std::string HeaderSignature, std::string BitTableSignature);
-	void DecryptContent();
+	void DecryptContent(int keycount);
 	int VerifyContentSignature();
 };
 

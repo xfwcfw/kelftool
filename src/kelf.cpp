@@ -137,7 +137,7 @@ int Kelf::LoadKelf(std::string filename)
 		Content += Block;
 	}
 
-	DecryptContent();
+	DecryptContent(header.Flags >> 4 & 3);
 
 	if (VerifyContentSignature() != 0)
 		return KELF_ERROR_INVALID_CONTENT_SIGNATURE;
@@ -327,13 +327,13 @@ std::string Kelf::GetRootSignature(std::string HeaderSignature, std::string BitT
 	return Root;
 }
 
-void Kelf::DecryptContent()
+void Kelf::DecryptContent(int keycount)
 {
 	uint32_t offset = 0;
 	for (int i = 0; i < bitTable.BlockCount; i++)
 	{
 		if (bitTable.Blocks[i].Flags & BIT_BLOCK_ENCRYPTED)
-			TdesCbcCfb64Decrypt(&Content.data()[offset], &Content.data()[offset], bitTable.Blocks[i].Size, Kc.data(), 2, ks.GetContentIV().data());
+			TdesCbcCfb64Decrypt(&Content.data()[offset], &Content.data()[offset], bitTable.Blocks[i].Size, Kc.data(), keycount, ks.GetContentIV().data());
 		offset += bitTable.Blocks[i].Size;
 	}
 }
